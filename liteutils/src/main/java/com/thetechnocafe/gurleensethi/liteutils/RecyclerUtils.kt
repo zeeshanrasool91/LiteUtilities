@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
+
 /**
  * Created by gurleensethi on 30/07/17.
  * Convenient RecyclerAdapter with generic data type list.
@@ -19,10 +20,11 @@ import android.view.ViewGroup
 open class RecyclerAdapterUtil<T>(
         val context: Context,
         //This list will serve as the main data list for the Recycler Adapter
-        val itemList: List<T>,
+        var itemList: ArrayList<T>,
         //The id of layout resource that is to be inflated when onCreateViewHolder is called
         val viewHolderLayoutRecourse: Int)
     : RecyclerView.Adapter<RecyclerAdapterUtil<T>.ViewHolder>() {
+
 
     /**
      * List containing all the views that are contained in the single item layout file
@@ -64,15 +66,32 @@ open class RecyclerAdapterUtil<T>(
         mViewsList = viewsList;
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(context).inflate(viewHolderLayoutRecourse, parent, false)
         return ViewHolder(view)
     }
 
     override fun getItemCount(): Int = itemList.size
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bindData(position)
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bindData(position)
+    }
+
+    fun addUpdateItemsList(updatedList: ArrayList<T>) {
+        itemList.addAll(updatedList)
+        notifyDataSetChanged()
+    }
+
+    fun resetItemsList(updatedList: ArrayList<T>) {
+        itemList = ArrayList()
+        itemList.addAll(updatedList)
+        notifyDataSetChanged()
+    }
+
+    fun clearItemsList() {
+        itemList.clear()
+        notifyDataSetChanged()
     }
 
     inner class ViewHolder(itemView: View) :
@@ -123,7 +142,7 @@ open class RecyclerAdapterUtil<T>(
     /**
      * Builder class for setting up recycler adapter
      */
-    class Builder<T>(context: Context, itemList: List<T>, viewHolderLayoutRecourse: Int) {
+    class Builder<T>(context: Context, itemList: ArrayList<T>, viewHolderLayoutRecourse: Int) {
 
         private var mRecyclerAdapter: RecyclerAdapterUtil<T> = RecyclerAdapterUtil(context, itemList, viewHolderLayoutRecourse)
 

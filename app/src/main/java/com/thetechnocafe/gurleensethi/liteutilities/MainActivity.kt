@@ -3,7 +3,6 @@ package com.thetechnocafe.gurleensethi.liteutilities
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.widget.TextView
 import com.thetechnocafe.gurleensethi.liteutils.*
@@ -15,29 +14,43 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val recyclerView = findViewById(R.id.recyclerView) as RecyclerView
-        val list = listOf("Test", "1", "2", "3", "This is a test", "123")
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        val recyclerAdapter = RecyclerAdapterUtil<String>(this, list, R.layout.item_recycler_view)
-        recyclerAdapter.addOnDataBindListener { itemView, item, position, viewsMap ->
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        val list: ArrayList<String> = ArrayList()
+        list.add("Test")
+        list.add("1")
+        list.add("2")
+        list.add("3")
+        list.add("This is a test")
+        list.add("123")
+        //Builder Approach
+        /*   recyclerView.layoutManager = LinearLayoutManager(this)
+           val recyclerAdapter = RecyclerAdapterUtil<String>(this, list, R.layout.item_recycler_view)
+           recyclerAdapter.addOnDataBindListener { itemView, item, position, viewsMap ->
+               val textView = viewsMap[R.id.textView] as TextView
+               textView.text = item
+           }
+           RecyclerAdapterUtil.Builder(this, list, R.layout.item_recycler_view)
+                   .viewsList(R.id.textView)
+                   .bindView { itemView, item, position, viewsMap ->
+                       val textView = viewsMap[R.id.textView] as TextView
+                       textView.text = item
+                   }
+                   .addClickListener { item, position ->
+                       coloredShortToast(item, android.R.color.darker_gray, android.R.color.black)
+                       //Take action when item is pressed
+                   }
+                   .addLongClickListener { item, position ->
+                       //Take action when item is long pressed
+                   }
+                   .into(recyclerView)*/
+        //new Approach
+        val recyclerAdapter2 = RecyclerAdapterUtil(this, list, R.layout.item_recycler_view)
+        recyclerAdapter2.addViewsList(R.id.textView)
+        recyclerAdapter2.addOnDataBindListener { itemView, item, position, viewsMap ->
             val textView = viewsMap[R.id.textView] as TextView
             textView.text = item
         }
-
-        RecyclerAdapterUtil.Builder(this, list, R.layout.item_recycler_view)
-                .viewsList(R.id.textView)
-                .bindView { itemView, item, position, viewsMap ->
-                    val textView = viewsMap[R.id.textView] as TextView
-                    textView.text = item
-                }
-                .addClickListener { item, position ->
-                    coloredShortToast(item, android.R.color.darker_gray, android.R.color.black)
-                    //Take action when item is pressed
-                }
-                .addLongClickListener { item, position ->
-                    //Take action when item is long pressed
-                }
-                .into(recyclerView)
+        recyclerView.adapter = recyclerAdapter2
 
         shortToast("This is a short toast")
         longToast("This is a long toast")
@@ -78,6 +91,25 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     .validate()
+        }
+
+        buttonAdd.setOnClickListener {
+            val list2: ArrayList<String> = ArrayList()
+            list2.add("Test")
+            list2.add("1")
+            list2.add("2")
+            list2.add("3")
+            list2.add("This is a test")
+            list2.add("123")
+            recyclerAdapter2.addUpdateItemsList(list2)
+        }
+
+        buttonClear.setOnClickListener {
+            recyclerAdapter2.clearItemsList()
+        }
+
+        buttonReset.setOnClickListener {
+            recyclerAdapter2.resetItemsList(list)
         }
 
         LogUtils.addLevel(LogLevel.ALL)

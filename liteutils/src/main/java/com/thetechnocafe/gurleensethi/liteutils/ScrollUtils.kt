@@ -61,8 +61,8 @@ public fun NestedScrollView.addScrollListener(listener: ScrollListener) {
  * @param floatingActionButton to be hidden/shown
  * */
 public fun RecyclerView.hideFloatingActionButtonOnScroll(floatingActionButton: FloatingActionButton) {
-    setOnScrollListener(object : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+    addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
             if (dy > 0 && floatingActionButton.visibility == View.VISIBLE) {
                 floatingActionButton.hide()
@@ -78,8 +78,8 @@ public fun RecyclerView.hideFloatingActionButtonOnScroll(floatingActionButton: F
  * @param floatingActionButton to be hidden/shown
  * */
 public fun RecyclerView.addScrollListener(listener: ScrollListener) {
-    setOnScrollListener(object : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+    addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
             if (dy > 0) {
                 listener.scrolledDown()
