@@ -20,17 +20,14 @@ interface ScrollListener {
  * @param floatingActionButton to be hidden/shown
  * */
 public fun NestedScrollView.hideFloatingActionButtonOnScroll(floatingActionButton: FloatingActionButton) {
-    setOnScrollChangeListener(object : NestedScrollView.OnScrollChangeListener {
-        override fun onScrollChange(v: NestedScrollView?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) {
-            //Calculate the y-axis displacement of the scroll
-            val displacementY = scrollY - oldScrollY
+    setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY -> //Calculate the y-axis displacement of the scroll
+        val displacementY = scrollY - oldScrollY
 
-            //According to the displacement hide or show the layout
-            if (displacementY > 0) {
-                floatingActionButton.hide()
-            } else if (displacementY < 0) {
-                floatingActionButton.show()
-            }
+        //According to the displacement hide or show the layout
+        if (displacementY > 0) {
+            floatingActionButton.hide()
+        } else if (displacementY < 0) {
+            floatingActionButton.show()
         }
     })
 }
@@ -40,19 +37,15 @@ public fun NestedScrollView.hideFloatingActionButtonOnScroll(floatingActionButto
  * @param listener with the required callbacks
  * */
 public fun NestedScrollView.addScrollListener(listener: ScrollListener) {
-    setOnScrollChangeListener(object : NestedScrollView.OnScrollChangeListener {
-        override fun onScrollChange(v: NestedScrollView?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) {
-            //Calculate the y-axis displacement of the scroll
-            val displacementY = scrollY - oldScrollY
+    setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY -> //Calculate the y-axis displacement of the scroll
+        val displacementY = scrollY - oldScrollY
 
-            //According to the displacement hide or show the layout
-            if (displacementY > 0) {
-                listener.scrolledDown()
-            } else if (displacementY < 0) {
-                listener.scrolledUp()
-            }
+        //According to the displacement hide or show the layout
+        if (displacementY > 0) {
+            listener.scrolledDown()
+        } else if (displacementY < 0) {
+            listener.scrolledUp()
         }
-
     })
 }
 
