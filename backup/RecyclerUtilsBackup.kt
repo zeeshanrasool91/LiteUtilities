@@ -1,10 +1,11 @@
 package com.thetechnocafe.gurleensethi.liteutils
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 
 
 /**
@@ -17,13 +18,13 @@ import android.view.ViewGroup
  * providing high customisation and complete control
  */
 
-open class RecyclerAdapterUtil<T>(
+open class RecyclerAdapterUtilBackup<T>(
         val context: Context,
         //This list will serve as the main data list for the Recycler Adapter
         var itemList: ArrayList<T>,
         //The id of layout resource that is to be inflated when onCreateViewHolder is called
         val viewHolderLayoutRecourse: Int, val loadingHolderLayoutRecourse: Int = 0)
-    : RecyclerView.Adapter<RecyclerAdapterUtil<T>.ViewHolder>() {
+    : RecyclerView.Adapter<RecyclerAdapterUtilBackup<T>.ViewHolder>() {
 
 
     /**
@@ -32,13 +33,6 @@ open class RecyclerAdapterUtil<T>(
      * to findViewById every time data is bound
      * */
     private var mViewsList: List<Int> = mutableListOf()
-
-    /**
-     * List containing all the views that are contained in the single item layout file
-     * There are retained before hand to improve performance and avoiding unnecessary calls
-     * to findViewById every time data is bound
-     * */
-    private var mSecondViewList: List<Int> = mutableListOf()
 
     /**
      * Listener to bind the data with the single item view.
@@ -73,19 +67,8 @@ open class RecyclerAdapterUtil<T>(
         mViewsList = viewsList
     }
 
-    /**
-     * Setters for views list
-     * */
-    fun addSecondViewsList(vararg viewsList: Int) {
-        mSecondViewList = viewsList.asList()
-    }
-
-    fun addSecondViewsList(viewsList: List<Int>) {
-        mSecondViewList = viewsList
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view: View = if (viewType == Companion.VIEW_TYPE_ITEM) {
+        val view: View = if (viewType == VIEW_TYPE_ITEM) {
             LayoutInflater.from(context).inflate(viewHolderLayoutRecourse, parent, false)
         } else {
             LayoutInflater.from(context).inflate(loadingHolderLayoutRecourse, parent, false)
@@ -95,9 +78,12 @@ open class RecyclerAdapterUtil<T>(
 
     override fun getItemCount(): Int = itemList.size
 
+    private val VIEW_TYPE_ITEM = 0
+    private val VIEW_TYPE_LOADING = 1
+
     override fun getItemViewType(position: Int): Int {
         //return super.getItemViewType(position)
-        return if (itemList[position] == "") Companion.VIEW_TYPE_LOADING else Companion.VIEW_TYPE_ITEM
+        return if (itemList[position] == "") VIEW_TYPE_LOADING else VIEW_TYPE_ITEM
     }
 
 
@@ -134,17 +120,9 @@ open class RecyclerAdapterUtil<T>(
         init {
             itemView.setOnClickListener(this)
             itemView.setOnLongClickListener(this)
-            if (itemViewType == Companion.VIEW_TYPE_ITEM) {
-                for (view in mViewsList) {
-                    itemView.findViewById<View>(view)?.let {
-                        viewMap[view] = it
-                    }
-                }
-            } else {
-                for (view in mSecondViewList) {
-                    itemView.findViewById<View>(view)?.let {
-                        viewMap[view] = it
-                    }
+            for (view in mViewsList) {
+                itemView.findViewById<View>(view)?.let{
+                    viewMap[view] = it
                 }
             }
         }
@@ -218,11 +196,6 @@ open class RecyclerAdapterUtil<T>(
         fun into(recyclerView: RecyclerView) {
             recyclerView.adapter = mRecyclerAdapter
         }
-    }
-
-    companion object {
-        const val VIEW_TYPE_ITEM = 0
-        const val VIEW_TYPE_LOADING = 1
     }
 }
 

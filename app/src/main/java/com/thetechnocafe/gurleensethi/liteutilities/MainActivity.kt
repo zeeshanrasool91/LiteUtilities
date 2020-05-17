@@ -2,14 +2,19 @@ package com.thetechnocafe.gurleensethi.liteutilities
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.support.annotation.NonNull
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.widget.TextView
 import com.thetechnocafe.gurleensethi.liteutils.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
+    var isLoading = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -44,13 +49,18 @@ class MainActivity : AppCompatActivity() {
                    }
                    .into(recyclerView)*/
         //new Approach
-        val recyclerAdapter2 = RecyclerAdapterUtil(this, list, R.layout.item_recycler_view)
+        val recyclerAdapter2 = RecyclerAdapterUtil(this, list, R.layout.item_recycler_view, R.layout.loading_layout)
         recyclerAdapter2.addViewsList(R.id.textView)
+        //recyclerAdapter2.addSecondViewsList(R.id.progressBar)
         recyclerAdapter2.addOnDataBindListener { itemView, item, position, viewsMap ->
-            val textView = viewsMap[R.id.textView] as TextView
-            textView.text = item
+            if(recyclerAdapter2.getItemViewType(position) == RecyclerAdapterUtil.VIEW_TYPE_ITEM) {
+                val textView = viewsMap[R.id.textView] as TextView
+                textView.text = item
+            }
+            //recyclerAdapter2.getItemViewType(position)
         }
         recyclerView.adapter = recyclerAdapter2
+        initScrollListener(recyclerAdapter2)
 
         shortToast("This is a short toast")
         longToast("This is a long toast")
@@ -127,7 +137,7 @@ class MainActivity : AppCompatActivity() {
         wtf("Ignore this")
         json("{message:'This is a message', version: {num: 10}}")
         shout("Shout this message loud!\nThank YOU")
-        exception(Exception("ERROR"))
+        //exception(Exception("ERROR"))
 
         /*val validator = Validator(passwordEditText.text.toString())
         validator.atLeastOneNumber()
@@ -136,4 +146,44 @@ class MainActivity : AppCompatActivity() {
                 .maximumLength(32)
                 .atLeastOneSpecialCharacter()*/
     }
+
+    private fun initScrollListener(recyclerAdapterUtil: RecyclerAdapterUtil<String>) {
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(@NonNull recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+            }
+
+            override fun onScrolled(@NonNull recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val linearLayoutManager: LinearLayoutManager? = recyclerView.layoutManager as LinearLayoutManager?
+                if (!isLoading) {
+                    if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == recyclerAdapterUtil.itemList.size - 1) {
+                        //bottom of list!
+                        loadMore(recyclerAdapterUtil)
+                        isLoading = true
+                    }
+                }
+            }
+        })
+    }
+
+    private fun loadMore(recyclerAdapterUtil: RecyclerAdapterUtil<String>) {
+        recyclerAdapterUtil.itemList.add("")
+        recyclerAdapterUtil.notifyItemInserted(recyclerAdapterUtil.itemList.size - 1)
+        val handler = Handler()
+        handler.postDelayed({
+            recyclerAdapterUtil.itemList.removeAt(recyclerAdapterUtil.itemList.size - 1)
+            val scrollPosition: Int = recyclerAdapterUtil.itemList.size
+            recyclerAdapterUtil.notifyItemRemoved(scrollPosition)
+            var currentSize = scrollPosition
+            val nextLimit = currentSize + 10
+            while (currentSize - 1 < nextLimit) {
+                recyclerAdapterUtil.itemList.add("Item $currentSize")
+                currentSize++
+            }
+            recyclerAdapterUtil.notifyDataSetChanged()
+            isLoading = false
+        }, 2000)
+    }
+
 }
